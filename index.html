@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yerbabuena — Auditoría</title>
+<style>
+:root{--verde:#1D9E75;--verde-dark:#0F6E56;--verde-light:#E8F5EF;--verde-bubble:#D1EDE0;--rojo:#E24B4A;--rojo-light:#FCEBEB;--ambar:#BA7517;--ambar-light:#FAEEDA;--azul:#185FA5;--azul-light:#E6F1FB;--sidebar-bg:#0D1F16;--bg:#F4F3EF;--card:#FFFFFF;--borde:rgba(0,0,0,.08);--borde2:rgba(0,0,0,.13);--texto:#181816;--texto2:#5C5C58;--texto3:#9C9C96;--chat-bg:#ECE5DD;--r:10px;--rlg:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--sidebar-bg);padding:0 20px;height:52px;flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--verde)}
+.brand-name{font-size:15px;font-weight:600;color:#fff}
+.brand-sub{font-size:11px;color:rgba(255,255,255,.35);margin-left:4px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.refresh-btn{display:flex;align-items:center;gap:6px;background:var(--verde);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.refresh-btn:hover{background:var(--verde-dark)}
+.refresh-btn:disabled{background:#444;cursor:not-allowed}
+.cfg-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer}
+.last-update{font-size:11px;color:rgba(255,255,255,.3)}
+.kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--borde);flex-shrink:0}
+.kpi{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:var(--r)}
+.kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.kpi-icon.verde{background:var(--verde-light)}.kpi-icon.rojo{background:var(--rojo-light)}.kpi-icon.ambar{background:var(--ambar-light)}.kpi-icon.azul{background:var(--azul-light)}
+.kpi-label{font-size:10px;color:var(--texto3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.kpi-val{font-size:22px;font-weight:700;line-height:1.1}
+.kpi-val.verde{color:var(--verde)}.kpi-val.rojo{color:var(--rojo)}.kpi-val.ambar{color:var(--ambar)}.kpi-val.azul{color:var(--azul)}
+.body-area{display:grid;grid-template-columns:300px 1fr 230px;flex:1;overflow:hidden}
+.chat-list-panel{background:var(--card);border-right:1px solid var(--borde);display:flex;flex-direction:column;overflow:hidden}
+.chat-list-head{padding:12px 14px;border-bottom:1px solid var(--borde);flex-shrink:0}
+.chat-list-title{font-size:13px;font-weight:700;color:var(--texto);margin-bottom:8px}
+.search-input{width:100%;padding:7px 12px;border:1px solid var(--borde2);border-radius:8px;background:var(--bg);color:var(--texto);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--verde)}
+.filter-row{display:flex;gap:5px;padding:8px 14px;border-bottom:1px solid var(--borde);flex-shrink:0;overflow-x:auto}
+.pill{font-size:11px;padding:4px 10px;border:1px solid var(--borde2);border-radius:20px;cursor:pointer;color:var(--texto2);background:transparent;white-space:nowrap;transition:all .12s;flex-shrink:0}
+.pill.active{background:var(--verde);color:#fff;border-color:var(--verde)}
+.chat-list{flex:1;overflow-y:auto}
+.chat-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--borde);cursor:pointer;transition:background .12s;position:relative}
+.chat-item:hover{background:var(--bg)}.chat-item.active{background:var(--verde-light)}
+.chat-item.handoff{border-left:3px solid var(--rojo)}.chat-item.reserva{border-left:3px solid var(--verde)}.chat-item.normal{border-left:3px solid transparent;padding-left:17px}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
+.chat-meta{flex:1;min-width:0}
+.chat-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.chat-name{font-size:13px;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:155px}
+.chat-time{font-size:10px;color:var(--texto3);flex-shrink:0}
+.chat-preview{font-size:12px;color:var(--texto2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-badges{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
+.badge.handoff{background:var(--rojo-light);color:var(--rojo)}.badge.reserva{background:var(--verde-light);color:var(--verde-dark)}.badge.evento{background:var(--azul-light);color:var(--azul)}.badge.consulta{background:var(--bg);color:var(--texto3);border:1px solid var(--borde2)}.badge.pago{background:#EAF3DE;color:#3B6D11}.badge.audio{background:#EEEDFE;color:#534AB7}
+.msg-count{position:absolute;right:12px;bottom:11px;background:var(--verde);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px}
+.empty-list{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--texto3);font-size:13px;gap:8px}
+.chat-view{display:flex;flex-direction:column;overflow:hidden;background:var(--chat-bg)}
+.chat-view-head{background:var(--card);padding:12px 18px;border-bottom:1px solid var(--borde);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-view-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.chat-view-name{font-size:14px;font-weight:700;color:var(--texto)}
+.chat-view-sub{font-size:12px;color:var(--texto3)}
+.chat-view-badges{display:flex;gap:6px;margin-left:auto}
+.chat-thread{flex:1;overflow-y:auto;padding:16px}
+.day-divider{text-align:center;margin:12px 0;font-size:11px;color:var(--texto3)}
+.day-divider span{background:rgba(255,255,255,.7);padding:3px 12px;border-radius:10px}
+.msg-pair{margin-bottom:14px}
+.bubble-wrap{display:flex;align-items:flex-end;gap:6px;margin-bottom:4px}
+.bubble-wrap.cliente{justify-content:flex-start}.bubble-wrap.laura{justify-content:flex-end}
+.bubble{max-width:72%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.55;position:relative;word-break:break-word;white-space:pre-wrap}
+.bubble.cliente{background:#fff;border-bottom-left-radius:3px;color:var(--texto)}
+.bubble.laura{background:var(--verde-bubble);border-bottom-right-radius:3px;color:var(--texto)}
+.bubble-time{font-size:10px;color:var(--texto3);margin-top:2px}
+.bubble-time.cliente{text-align:left;padding-left:4px}.bubble-time.laura{text-align:right;padding-right:4px}
+.no-chat{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--texto3);font-size:14px;gap:10px}
+.no-chat-icon{font-size:48px;opacity:.3}
+.right-panel{background:var(--card);border-left:1px solid var(--borde);overflow-y:auto;display:flex;flex-direction:column}
+.alert-section{border-bottom:1px solid var(--borde)}
+.alert-head{padding:11px 14px;display:flex;align-items:center;gap:8px}
+.alert-head-title{font-size:12px;font-weight:700;color:var(--texto);flex:1}
+.alert-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.alert-count.rojo{background:var(--rojo-light);color:var(--rojo)}.alert-count.ambar{background:var(--ambar-light);color:var(--ambar)}.alert-count.verde{background:var(--verde-light);color:var(--verde-dark)}
+.alert-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.alert-dot.rojo{background:var(--rojo)}.alert-dot.ambar{background:var(--ambar)}.alert-dot.verde{background:var(--verde)}
+.alert-item{padding:9px 14px;border-top:1px solid var(--borde);cursor:pointer;transition:background .12s}
+.alert-item:hover{background:var(--bg)}
+.alert-name{font-size:12px;font-weight:600;color:var(--texto)}
+.alert-detail{font-size:11px;color:var(--texto3);margin-top:2px;line-height:1.4}
+.empty-alert{padding:14px;font-size:12px;color:var(--texto3);text-align:center}
+.loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--texto3);font-size:13px;gap:8px;flex-direction:column}
+.spinner{width:22px;height:22px;border:2px solid var(--borde2);border-top-color:var(--verde);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999}
+.modal{background:#fff;border-radius:16px;padding:28px;width:460px;max-width:95vw}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--texto2);margin-bottom:18px;line-height:1.5}
+.field-label{font-size:12px;font-weight:600;color:var(--texto2);margin-bottom:5px}
+.field-input{width:100%;padding:9px 12px;border:1px solid var(--borde2);border-radius:8px;font-size:13px;outline:none;color:var(--texto)}
+.field-input:focus{border-color:var(--verde)}
+.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.btn-primary{background:var(--verde);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-secondary{background:transparent;color:var(--texto2);border:1px solid var(--borde2);border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Yerbabuena</span>
+    <span class="brand-sub">Auditoría · Laura</span>
+  </div>
+  <div class="topbar-right">
+    <span class="last-update" id="lastUpdate"></span>
+    <button class="refresh-btn" onclick="fetchData()" id="refreshBtn">↻ Actualizar</button>
+    <button class="cfg-btn" onclick="openConfig()">⚙</button>
+  </div>
+</div>
+
+<div class="kpi-bar">
+  <div class="kpi"><div class="kpi-icon azul">💬</div><div class="kpi-data"><div class="kpi-label">Chats hoy</div><div class="kpi-val azul" id="k1">—</div></div></div>
+  <div class="kpi"><div class="kpi-icon verde">📅</div><div class="kpi-data"><div class="kpi-label">Reservas hoy</div><div class="kpi-val verde" id="k2">—</div></div></div>
+  <div class="kpi"><div class="kpi-icon ambar">⚠️</div><div class="kpi-data"><div class="kpi-label">HANDOFFs</div><div class="kpi-val ambar" id="k3">—</div></div></div>
+  <div class="kpi"><div class="kpi-icon rojo">🔴</div><div class="kpi-data"><div class="kpi-label">Sin seguimiento</div><div class="kpi-val rojo" id="k4">—</div></div></div>
+</div>
+
+<div class="body-area">
+  <div class="chat-list-panel">
+    <div class="chat-list-head">
+      <div class="chat-list-title" id="chatListTitle">Conversaciones</div>
+      <input class="search-input" id="buscar" placeholder="🔍  Buscar cliente o número..." oninput="renderList()">
+    </div>
+    <div class="filter-row">
+      <button class="pill active" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="pill" onclick="setFiltro('hoy',this)">Hoy</button>
+      <button class="pill" onclick="setFiltro('handoff',this)">HANDOFF</button>
+      <button class="pill" onclick="setFiltro('reserva',this)">Reservas</button>
+      <button class="pill" onclick="setFiltro('consulta',this)">Consultas</button>
+    </div>
+    <div class="chat-list" id="chatList">
+      <div class="loading"><div class="spinner"></div><span>Cargando...</span></div>
+    </div>
+  </div>
+
+  <div class="chat-view" id="chatView">
+    <div class="no-chat"><div class="no-chat-icon">💬</div><span>Selecciona una conversación</span></div>
+  </div>
+
+  <div class="right-panel">
+    <div class="alert-section">
+      <div class="alert-head"><div class="alert-dot rojo"></div><div class="alert-head-title">Sin seguimiento</div><span class="alert-count rojo" id="perdidosBadge">0</span></div>
+      <div id="perdidosList"><div class="empty-alert">Sin datos</div></div>
+    </div>
+    <div class="alert-section">
+      <div class="alert-head"><div class="alert-dot ambar"></div><div class="alert-head-title">HANDOFFs activos</div><span class="alert-count ambar" id="handoffBadge">0</span></div>
+      <div id="handoffList"><div class="empty-alert">Sin datos</div></div>
+    </div>
+    <div class="alert-section">
+      <div class="alert-head"><div class="alert-dot verde"></div><div class="alert-head-title">Anticipos pendientes</div><span class="alert-count verde" id="anticipoBadge">0</span></div>
+      <div id="anticipoList"><div class="empty-alert">Sin datos</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="configModal" style="display:none">
+  <div class="modal">
+    <div class="modal-title">🔗 Fuente de datos</div>
+    <div class="modal-sub">URL de tu Apps Script desplegado como aplicación web.</div>
+    <div class="field-label">URL del Apps Script</div>
+    <input class="field-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeConfig()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarUrl()">Conectar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let scriptUrl = localStorage.getItem('yb_script_url') || 'https://script.google.com/macros/s/AKfycbybiALOLESaYsRL2pHXQFMpRkN2iHRtq0HLsSXnw2Gm-SDN2ejxOrZT26hy8R4cIjqU/exec';
+let datos = null, filtro = 'todos', convSel = null;
+const COLORES = ['#1D9E75','#185FA5','#BA7517','#A32D2D','#534AB7','#0F6E56','#3B6D11'];
+function colorAvatar(s){let h=0;for(let c of String(s||''))h=(h*31+c.charCodeAt(0))%COLORES.length;return COLORES[h]}
+function iniciales(n){const p=(n||'?').trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase()}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+window.onload = () => {
+  fetchData();
+  // Polling silencioso cada 15 segundos
+  setInterval(fetchSilencioso, 15000);
+};
+
+async function fetchData(){
+  const btn=document.getElementById('refreshBtn');
+  btn.disabled=true;btn.textContent='↻ Cargando...';
+  document.getElementById('chatList').innerHTML='<div class="loading"><div class="spinner"></div><span>Cargando conversaciones...</span></div>';
+  try{
+    const res=await fetch(scriptUrl);
+    datos=await res.json();
+    if(datos.error)throw new Error(datos.error);
+    renderAll();
+    document.getElementById('lastUpdate').textContent='Actualizado: '+datos.generado;
+  }catch(e){
+    document.getElementById('chatList').innerHTML=`<div class="loading" style="color:var(--rojo)">Error: ${e.message}</div>`;
+  }
+  btn.disabled=false;btn.textContent='↻ Actualizar';
+}
+
+// Fetch silencioso — no toca la UI, no pierde la conversación abierta
+async function fetchSilencioso(){
+  try{
+    const res=await fetch(scriptUrl);
+    const nuevos=await res.json();
+    if(nuevos.error||!nuevos.ok)return;
+    datos=nuevos;
+    // Actualizar KPIs y alertas sin tocar el hilo abierto
+    const s=datos.stats||{};
+    document.getElementById('k1').textContent=s.conversacionesHoy??0;
+    document.getElementById('k2').textContent=s.reservasHoy??0;
+    document.getElementById('k3').textContent=s.handoffsHoy??0;
+    document.getElementById('k4').textContent=s.clientesPerdidos??0;
+    document.getElementById('lastUpdate').textContent='Actualizado: '+datos.generado;
+    renderAlertas();
+    renderList();
+    // Si hay una conversación abierta, refrescar su hilo con los nuevos mensajes
+    if(convSel){
+      const convActualizada=(datos.conversaciones||[]).find(c=>c.telefono===convSel.telefono);
+      if(convActualizada){
+        const antMensajes=convSel.mensajes||[];
+        const nuevosMensajes=convActualizada.mensajes||[];
+        // Solo re-renderizar el hilo si llegaron mensajes nuevos
+        if(nuevosMensajes.length!==antMensajes.length){
+          convSel=convActualizada;
+          abrirChat(convSel.telefono);
+        }
+      }
+    }
+  }catch(e){
+    // Fallo silencioso — no mostrar error al usuario
+  }
+}
+
+function renderAll(){
+  if(!datos)return;
+  const s=datos.stats||{};
+  document.getElementById('k1').textContent=s.conversacionesHoy??0;
+  document.getElementById('k2').textContent=s.reservasHoy??0;
+  document.getElementById('k3').textContent=s.handoffsHoy??0;
+  document.getElementById('k4').textContent=s.clientesPerdidos??0;
+  renderList();renderAlertas();
+}
+
+function renderList(){
+  if(!datos)return;
+  const q=(document.getElementById('buscar').value||'').toLowerCase();
+  const hoyStr=new Date().toLocaleDateString('es-CO');
+  let convs=(datos.conversaciones||[]).filter(c=>{
+    if(filtro==='handoff')return c.tieneHandoff;
+    if(filtro==='reserva')return c.tieneReserva;
+    if(filtro==='hoy')return c.ultimaFecha===hoyStr;
+    if(filtro==='consulta')return !c.tieneHandoff&&!c.tieneReserva;
+    return true;
+  }).filter(c=>!q||(c.nombre||'').toLowerCase().includes(q)||String(c.telefono||'').includes(q));
+
+  document.getElementById('chatListTitle').textContent=`Conversaciones (${convs.length})`;
+  if(!convs.length){document.getElementById('chatList').innerHTML='<div class="empty-list"><span>💬</span><span>Sin conversaciones</span></div>';return;}
+
+  document.getElementById('chatList').innerHTML=convs.map(c=>{
+    const tipo=c.tieneHandoff?'handoff':c.tieneReserva?'reserva':'normal';
+    const color=colorAvatar(c.telefono);
+    const ini=iniciales(c.nombre);
+    const msgs=c.mensajes||[];
+    const ultimo=msgs.length?msgs[msgs.length-1]:{};
+    const preview=esc((ultimo.mensajeCliente||'').substring(0,50));
+    const isActive=convSel&&convSel.telefono===c.telefono;
+    let badges='';
+    if(c.tieneHandoff)badges+='<span class="badge handoff">HANDOFF</span>';
+    if(c.tieneReserva)badges+='<span class="badge reserva">RESERVA</span>';
+    return `<div class="chat-item ${tipo}${isActive?' active':''}" onclick="abrirChat('${esc(c.telefono)}')">
+      <div class="avatar" style="background:${color}">${ini}</div>
+      <div class="chat-meta">
+        <div class="chat-name-row"><div class="chat-name">${esc(c.nombre)}</div><div class="chat-time">${c.ultimaHora||''}</div></div>
+        <div class="chat-preview">${preview}</div>
+        ${badges?`<div class="chat-badges">${badges}</div>`:''}
+      </div>
+      <div class="msg-count">${msgs.length}</div>
+    </div>`;
+  }).join('');
+}
+
+function abrirChat(telefono){
+  if(!datos)return;
+  const conv=(datos.conversaciones||[]).find(c=>c.telefono===telefono);
+  if(!conv)return;
+  convSel=conv;renderList();
+  const color=colorAvatar(conv.telefono);
+  const ini=iniciales(conv.nombre);
+  const msgs=conv.mensajes||[];
+  let badgesHead='';
+  if(conv.tieneHandoff)badgesHead+='<span class="badge handoff">HANDOFF</span>';
+  if(conv.tieneReserva)badgesHead+='<span class="badge reserva">RESERVA</span>';
+  let hilo='',fechaAnt='';
+  msgs.forEach(m=>{
+    if(m.fecha!==fechaAnt){hilo+=`<div class="day-divider"><span>${esc(m.fecha)}</span></div>`;fechaAnt=m.fecha;}
+    const accionBadge=m.accion&&m.accion!=='CONSULTA'?`<span class="badge ${m.accion.toLowerCase().includes('handoff')?'handoff':m.accion.toLowerCase().includes('reserva')?'reserva':'pago'}">${esc(m.accion)}</span>`:'';
+    hilo+=`<div class="msg-pair">
+      <div class="bubble-wrap cliente"><div>
+        <div class="bubble cliente">${esc(m.mensajeCliente||'[sin texto]')}</div>
+        <div class="bubble-time cliente">${esc(m.hora)}</div>
+      </div></div>
+      <div class="bubble-wrap laura"><div>
+        <div class="bubble laura">${esc(m.respuestaLaura||'...')}</div>
+        ${accionBadge?`<div style="text-align:right;margin-top:3px">${accionBadge}</div>`:''}
+        <div class="bubble-time laura">Laura · ${esc(m.hora)}</div>
+      </div></div>
+    </div>`;
+  });
+  document.getElementById('chatView').innerHTML=`
+    <div class="chat-view-head">
+      <div class="chat-view-avatar" style="background:${color}">${ini}</div>
+      <div><div class="chat-view-name">${esc(conv.nombre)}</div><div class="chat-view-sub">+${esc(conv.telefono)} · ${msgs.length} mensajes</div></div>
+      <div class="chat-view-badges">${badgesHead}</div>
+    </div>
+    <div class="chat-thread" id="chatThread">${hilo}</div>`;
+  setTimeout(()=>{const t=document.getElementById('chatThread');if(t)t.scrollTop=t.scrollHeight;},50);
+}
+
+function renderAlertas(){
+  if(!datos)return;
+  const perdidos=datos.clientesPerdidos||[];
+  document.getElementById('perdidosBadge').textContent=perdidos.length;
+  document.getElementById('perdidosList').innerHTML=perdidos.length
+    ?perdidos.map(c=>`<div class="alert-item" onclick="abrirChat('${esc(c.telefono)}')"><div class="alert-name">${esc(c.nombre||c.telefono)}</div><div class="alert-detail">Último: ${c.ultimaHora||''}</div></div>`).join('')
+    :'<div class="empty-alert">Sin casos pendientes ✅</div>';
+  const hofs=datos.handoffs||[];
+  document.getElementById('handoffBadge').textContent=hofs.length;
+  document.getElementById('handoffList').innerHTML=hofs.length
+    ?hofs.slice(0,6).map(c=>`<div class="alert-item" onclick="abrirChat('${esc(c.telefono)}')"><div class="alert-name">${esc(c.nombre||c.telefono)}</div><div class="alert-detail">${c.ultimaFecha||''} · ${c.ultimaHora||''}</div></div>`).join('')
+    :'<div class="empty-alert">Sin HANDOFFs ✅</div>';
+  const ant=datos.anticiposPendientes||[];
+  document.getElementById('anticipoBadge').textContent=ant.length;
+  document.getElementById('anticipoList').innerHTML=ant.length
+    ?ant.map(r=>`<div class="alert-item"><div class="alert-name">${esc(r.Nombre||'')}</div><div class="alert-detail">${r.Personas||''} personas · ${r.Fecha_Reserva||''}</div></div>`).join('')
+    :'<div class="empty-alert">Sin anticipos ✅</div>';
+}
+
+function setFiltro(f,btn){filtro=f;document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList();}
+function openConfig(){document.getElementById('configModal').style.display='flex';document.getElementById('scriptUrl').value=scriptUrl;}
+function closeConfig(){document.getElementById('configModal').style.display='none';}
+function guardarUrl(){const url=document.getElementById('scriptUrl').value.trim();if(!url.startsWith('http'))return;scriptUrl=url;localStorage.setItem('yb_script_url',url);closeConfig();fetchData();}
+</script>
+</body>
+</html>
