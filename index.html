@@ -267,7 +267,7 @@ function renderList(){
     const ini=iniciales(c.nombre);
     const msgs=c.mensajes||[];
     const ultimo=msgs.length?msgs[msgs.length-1]:{};
-    const preview=esc((ultimo.mensajeCliente||'').substring(0,50));
+    const preview=esc(String(ultimo.mensajeCliente||'').substring(0,50));
     const isActive=convSel&&convSel.telefono===c.telefono;
     let badges='';
     if(c.tieneHandoff)badges+='<span class="badge handoff">HANDOFF</span>';
